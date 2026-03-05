@@ -1,0 +1,587 @@
+basePath: /api/
+definitions:
+  config.Config:
+    properties:
+      defaultLimit:
+        type: string
+      defaultOffset:
+        type: string
+      environment:
+        description: debug, test, release
+        type: string
+      httpport:
+        type: string
+      httpscheme:
+        type: string
+      passcodeLength:
+        type: integer
+      passcodePool:
+        type: string
+      postgresDatabase:
+        type: string
+      postgresHost:
+        type: string
+      postgresMaxConnections:
+        type: integer
+      postgresPassword:
+        type: string
+      postgresPort:
+        type: integer
+      postgresUser:
+        type: string
+      secretKey:
+        type: string
+      serviceHost:
+        type: string
+      serviceName:
+        type: string
+      smtpfrom:
+        type: string
+      smtphost:
+        description: Email Configuration
+        type: string
+      smtppassword:
+        type: string
+      smtpport:
+        type: integer
+      smtpusername:
+        type: string
+      version:
+        type: string
+    type: object
+  github_com_Ramazon1227_go-rest-api-starter_api_http.Response:
+    properties:
+      data: {}
+      description:
+        type: string
+      status:
+        type: string
+    type: object
+  models.GetUserListModel:
+    properties:
+      count:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      password:
+        example: secret123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.LoginResponse:
+    properties:
+      expires_at:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.LogoutRequest:
+    properties:
+      token:
+        type: string
+    required:
+    - token
+    type: object
+  models.UpdatePasswordRequest:
+    properties:
+      current_password:
+        example: oldpassword123
+        type: string
+      new_password:
+        example: newpassword123
+        type: string
+    required:
+    - current_password
+    - new_password
+    type: object
+  models.UpdateProfileRequest:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone:
+        example: "+1234567890"
+        type: string
+    type: object
+  models.UpdateUserProfileModel:
+    properties:
+      email:
+        type: string
+      id:
+        example: some uuid
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone:
+        type: string
+      user_role:
+        type: string
+    type: object
+  models.User:
+    properties:
+      active:
+        type: integer
+      created_at:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      id:
+        example: some uuid
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+      user_role:
+        example: SYSTEM_ADMIN,ORGANIZATION_ADMIN,INSTRUCTOR,STUDENT
+        type: string
+    type: object
+  models.UserCreateModel:
+    properties:
+      email:
+        type: string
+      name:
+        example: John Doe
+        type: string
+      phone:
+        type: string
+      user_role:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is an api gateway
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Exam Management System API
+  version: "1.0"
+paths:
+  /config:
+    get:
+      consumes:
+      - application/json
+      description: show service config data when the service environment set to debug
+        mode
+      operationId: get_config
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Response data
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/config.Config'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      summary: get config data on the debug mode
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: this returns "pong" messsage to show service is working
+      operationId: ping
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Response data
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      summary: returns "pong" message
+  /v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return JWT token
+      operationId: login
+      parameters:
+      - description: login credentials
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      summary: Login User
+      tags:
+      - auth
+  /v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidate user's JWT token
+      operationId: logout
+      parameters:
+      - description: logout request
+        in: body
+        name: logout
+        required: true
+        schema:
+          $ref: '#/definitions/models.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      summary: Logout User
+      tags:
+      - auth
+  /v1/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get authenticated user's profile information
+      operationId: get-profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User Profile
+      tags:
+      - profile
+    put:
+      consumes:
+      - application/json
+      description: Update authenticated user's profile
+      operationId: update-profile
+      parameters:
+      - description: profile data
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User Profile
+      tags:
+      - profile
+  /v1/profile/password:
+    put:
+      consumes:
+      - application/json
+      description: Update authenticated user's password
+      operationId: update-password
+      parameters:
+      - description: password data
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User Password
+      tags:
+      - profile
+  /v1/user:
+    get:
+      consumes:
+      - application/json
+      description: Get list of users with pagination
+      operationId: get-user-list
+      parameters:
+      - description: offset
+        in: query
+        name: offset
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.GetUserListModel'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User List
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      operationId: create-user
+      parameters:
+      - description: user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserCreateModel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create User
+      tags:
+      - user
+  /v1/user/{user_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      operationId: delete-user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete User
+      tags:
+      - user
+    get:
+      consumes:
+      - application/json
+      description: Get user details by ID
+      operationId: get-user-by-id
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get User By ID
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update user profile
+      operationId: update-user
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserProfileModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/github_com_Ramazon1227_go-rest-api-starter_api_http.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update User
+      tags:
+      - user
+securityDefinitions:
+  ApiKeyAuth:
+    description: Enter the token with Bearer prefix, e.g. "Bearer abcde12345"
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
